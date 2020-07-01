@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xsi:schemaLocation="http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+	<!-- root-context.xml : mvc 설정과 관련된 여러 처리를 담당하는 설정 파일 (ex: DAO, VO, service...) 
+		xml의 형태를 어떻게 사용할 것인가 빈(객체)들을 관리하는 문서(xml)이다. 필요할 때마다 주입해서 사용하기 위해 이곳에 빈을 
+		등록해둔다. (bean태그를 사용해서 등록한다. id="빈의 이름" class="클래스의 위치") 다운받은 라이브러리들을 사용하는 
+		곳 -->
+
+	<!-- properties 파일 로딩하기 -->
+	<context:property-placeholder
+		location="classpath:database/jdbc.properties" />
+
+	<!-- [DB 관련 설정 : DB 관련 정보를 커넥션 풀 객체에 담는 설정] -->
+	<!-- 1. HikariConfig 빈 등록 -->
+	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+		<!-- 변수 설정 : property 태그 사용, name="변수 이름" value="저장 값" -->
+		<!-- 보안을 위해 직접 작성하지 않고 properties를 el태그로 불러오는 방식을 사용했다. -->
+		<property name="driverClassName"
+			value="${jdbc.driverClassName}" />
+		<property name="jdbcUrl" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+
+		<!-- 추가 속성 -->
+		<property name="maximumPoolSize" value="30" />
+	</bean>
+
+	<!-- 2. DataSource 등록 : 데이터베이스의 정보들을 포장하고있는 애들 -->
+	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource"
+		destroy-method="close">
+		<!-- 생성자를 통한 의존성 주입 -->
+		<constructor-arg ref="hikariConfig" />
+	</bean>
+
+	<!-- [마이바티스 주요 객체 sessionFactory클래스 빈등록] -->
+	<bean id="sqlSessionFactory"
+		class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- setter를 통한 의존성 주입 -->
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- [마이바티스를 쉽게 사용할 템플릿 클래스 빈 등록] -->
+	<bean id="sqlSession" name="sqlSession"
+		class="org.mybatis.spring.SqlSessionTemplate"
+		destroy-method="clearCache">
+		<constructor-arg name="sqlSessionFactory"
+			ref="sqlSessionFactory" />
+	</bean>
+
+
+	<!-- [Mapper.xml 파일을 빈객체로 등록하는 설정] -->
+	<mybatis-spring:scan
+		base-package="or.itschool.mapper" />
+
+	<!-- [컴포넌트 자동 스캔 명령] -->
+	<!-- 자동주입 명령을 사용하기 위해 위치를 알려줘야한다. -->
+	<!-- <context:component-scan
+		base-package="or.itschool.controller" /> -->
+
+	<context:component-scan
+		base-package="or.itschool.service"></context:component-scan>
+
+</beans>

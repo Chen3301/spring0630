@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- mybatis-config.xml : 마이바티스 설정 파일로 사용하겠다. 라고 선언 문을 아래와 같이 작성, 외우는거 아님 -->
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- 긴 패키지명을 간단하게 적기위해 앨리아스 처리를 해준다. -->
+  <!-- BoardMapper.xml 같은 매퍼파일에서 resultType을 가볍게 별칭으로 처리하는 방법 -->
+   <!--  <typeAliases>
+        <typeAlias type="or.itschool.model.BoardVO" alias="BoardVO"/>
+    </typeAliases> -->
+</configuration>

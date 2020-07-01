@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 이곳은 맵퍼야 라고 알려주는 선언문 : 반드시 작성 -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 매퍼의 namespace 속성을 사용해 매퍼의 이름을 정해준다. 기존의 방식에서는 repository의 DAO의 인터페이스의 
+	경로를 썼는데 간단하게 맘대로 적어두고 설정을 하고 DAO에 레파지토리 어노테이션(@Repository)을 달아준다. -->
+<mapper namespace="or.itschool.mapper.BoardMapper">
+	<!-- id에는 연결된 레파지토리의 메서드 이름과 동일하게 설정한다. -->
+	<!-- 게시물 등록 -->
+	<insert id="insert">
+		insert into tbl_board(title, content, writer)
+		values(#{title}, #{content},#{writer})
+	</insert>
+
+	<!-- DB 컬럼과 VO필드명이 다를 경우 리절트 맵 처리 방법 간단한 이름 사용하기 위해 mybatis-config.xml에 
+		엘리아스 설정을 해준다. type에 원래 다 들어가야하지만 설정파일에서 별칭을 정해줬기 때문에 BoardVO로만 가능 -->
+	<resultMap id="boardMap" type="or.itschool.model.BoardVO">
+		<id property="boardNo" column="board_no" />
+		<result property="title" column="title" />
+		<result property="content" column="content" />
+		<result property="writer" column="writer" />
+		<result property="regDate" column="reg_date" />
+		<result property="viewCnt" column="view_cnt" />
+	</resultMap>
+
+	<!-- 단일 게시물 조회 -->
+	<select id="getArticle" resultMap="boardMap">
+		select * from tbl_board where
+		board_no = #{boardNo}
+	</select>
+
+	<!-- 게시글 수정 -->
+	<update id="update">
+		update tbl_board set title=#{title},
+		content=#{content} where board_no=#{boardNo}
+	</update>
+
+	<!-- 게시글 삭제 -->
+	<delete id="delete">
+		delete from tbl_board where board_no = #{boardNo}
+	</delete>
+
+	<!-- 모든 게시물 조회 <![CDATA[ ]]>구문 안에 SQL을 작성하면 연산자 기호를 문자열로 처리할 수 있다.-->
+	<select id="getAllArticles" resultMap="boardMap">
+    <![CDATA[
+    select * from tbl_board where board_no > 0 order by board_no DESC        
+    ]]>
+	</select>
+
+</mapper>
